@@ -40,7 +40,7 @@ namespace Frontend.Helpers
             }
             Console.ReadKey();
         }
-        private byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
+        public byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
         {
             byte[] encrypted;
             // Create a new AesManaged.    

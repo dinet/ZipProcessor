@@ -10,12 +10,22 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using Frontend.Helpers;
+using System.Net.Http;
+using System.Text;
 
 namespace Frontend.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
+        HttpClient client = new HttpClient();
+
+        public SampleDataController()
+        {
+            client.BaseAddress = new Uri("https://localhost:44306/");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -41,7 +51,7 @@ namespace Frontend.Controllers
                 string fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                 #region Creating Json  
                 ZipArchive t = new ZipArchive(file.OpenReadStream());
-                Node root = new Node() { Title ="."};
+                Node root = new Node() { Title = "." };
                 foreach (var item in t.Entries)
                 {
                     var split = item.FullName.Split('/');
@@ -66,10 +76,14 @@ namespace Frontend.Controllers
 
                 #region Encryption
                 EncryptionHelper ec = new EncryptionHelper(null, null);
-                ec.EncryptAesManaged(json);
-
- 
+                AesManaged aes = new AesManaged();
+                byte[] encrypted = ec.Encrypt(json, aes.Key, aes.IV);
                 #endregion
+
+                #region Send Request
+                this.client.PostAsync("api/values/PostJson", new StringContent(json, Encoding.UTF8, "application/json"));
+                #endregion
+
 
             }
             return Json("Upload Successful.");
