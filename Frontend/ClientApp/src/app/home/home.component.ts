@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { HttpClient } from '@angular/common/http'; 
+import { Inject } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -7,12 +8,19 @@ import { HttpModule } from '@angular/http';
 })
 export class HomeComponent {
   fileToUpload: File = null;
+  baseUrl: string = '';
+  constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
   handleFileInput(files: FileList) {
     this.fileToUpload = files.item(0);
-
-
-    Observable<Response> ob = this.http.post(this.url, book, options); 
-    console.log(this.fileToUpload);
+    const formData = new FormData();
+    formData.append(this.fileToUpload.name, this.fileToUpload);
+    this.http.post(this.baseUrl + 'api/SampleData/UploadFile', formData).subscribe(
+        data => console.log('success'),
+        error => console.log(error)
+      ); 
   }
 
 }
