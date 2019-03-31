@@ -19,29 +19,15 @@ namespace Frontend.Controllers
     public class SampleDataController : Controller
     {
         HttpClient client = new HttpClient();
+        EncryptionHelper _encryptionHelper; 
 
-        public SampleDataController()
+        public SampleDataController(EncryptionHelper encryptionHelper)
         {
+            // Should get from config
             client.BaseAddress = new Uri("https://localhost:44306/");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _encryptionHelper = encryptionHelper;
         }
 
-        private static string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            });
-        }
         [HttpPost("[action]"), DisableRequestSizeLimit]
         public ActionResult UploadFile()
         {
@@ -75,13 +61,18 @@ namespace Frontend.Controllers
                 #endregion
 
                 #region Encryption
-                EncryptionHelper ec = new EncryptionHelper(null, null);
-                AesManaged aes = new AesManaged();
-                byte[] encrypted = ec.Encrypt(json, aes.Key, aes.IV);
+                byte[] encrypted = _encryptionHelper.Encrypt(json);                
+                string decrtypted = _encryptionHelper.Decrypt(encrypted);
                 #endregion
 
                 #region Send Request
-                this.client.PostAsync("api/values/PostJson", new StringContent(json, Encoding.UTF8, "application/json"));
+                string userName = "user_name";
+                string password = "password";
+                byte[] usernamePassword = _encryptionHelper.Encrypt($"{userName}:{password}");
+                string userNamePasswordString = Convert.ToBase64String(usernamePassword);
+                string encryptedJsonString = Convert.ToBase64String(encrypted);
+                this.client.DefaultRequestHeaders.Add("Authorization", $"Basic {userNamePasswordString}");
+                this.client.PostAsync("api/values/PostJson", new StringContent(encryptedJsonString));
                 #endregion
 
 
@@ -97,21 +88,6 @@ namespace Frontend.Controllers
 
             public string Title { get; set; }
             public List<Node> Contents { get; set; }
-        }
-
-        public class WeatherForecast
-        {
-            public string DateFormatted { get; set; }
-            public int TemperatureC { get; set; }
-            public string Summary { get; set; }
-
-            public int TemperatureF
-            {
-                get
-                {
-                    return 32 + (int)(TemperatureC / 0.5556);
-                }
-            }
         }
     }
 }

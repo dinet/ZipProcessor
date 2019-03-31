@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DataManager.Helpers;
 using DataManager.Models;
 using DataManager.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +17,12 @@ namespace DataManager.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly DatabaseService _databaseService;
+        private EncryptionHelper _encryptionHelper;
 
-        public ValuesController(DatabaseService databaseService)
+        public ValuesController(DatabaseService databaseService, EncryptionHelper encryptionHelper)
         {
             _databaseService = databaseService;
+            _encryptionHelper = encryptionHelper;
         }
         // GET api/values
         [HttpGet]
@@ -47,16 +51,22 @@ namespace DataManager.Controllers
         }
 
         [HttpPost("[action]")]
-        public void PostJson([FromBody]Node jsonResult)
+        public void PostJson()
         {
-            Request.ToString();
-            //Node item = JsonConvert.DeserializeObject<Node>(jsonResult.ToString());
-            _databaseService.Create(new Record()
+            using (var reader = new StreamReader(Request.Body))
             {
-             //   Id = new Random().Next().ToString(),
-                Node = jsonResult,
-                UserId = 1234
-            });
+                string plainText = reader.ReadToEnd();
+                byte[] array = Convert.FromBase64String(plainText);
+                string json = _encryptionHelper.Decrypt(array);
+                Node item = JsonConvert.DeserializeObject<Node>(json);
+                _databaseService.Create(new Record()
+                {
+                    //   Id = new Random().Next().ToString(),
+                    Node = item,
+                    UserId = 1234
+                });
+            }
+
         }
         //// PUT api/values/5
         //[HttpPut("{id}")]

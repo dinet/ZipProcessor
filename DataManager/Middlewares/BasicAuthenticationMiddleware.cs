@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataManager.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,20 +21,20 @@ namespace DataManager.Middlewares
             _config = iConfig;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, EncryptionHelper encryptionHelper)
         {
+
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic"))
             {
                 //Extract credentials
-                string encodedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
-                Encoding encoding = Encoding.GetEncoding("iso-8859-1");
-                string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
+                string encryptedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
+                byte[] encryptedUsernamePasswordBytes = Convert.FromBase64String(encryptedUsernamePassword);
+                string usernamePassword = encryptionHelper.Decrypt(encryptedUsernamePasswordBytes);
 
-                int seperatorIndex = usernamePassword.IndexOf(':');
-
-                var username = usernamePassword.Substring(0, seperatorIndex);
-                var password = usernamePassword.Substring(seperatorIndex + 1);
+                string[] stringSplits = usernamePassword.Split(':');
+                string username = stringSplits[0];
+                string password = stringSplits[1];
 
                 if (IsAuthorized(username, password))
                 {

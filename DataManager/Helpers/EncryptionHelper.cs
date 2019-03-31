@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace Frontend.Helpers
+namespace DataManager.Helpers
 {
     public class EncryptionHelper
     {
