@@ -74,8 +74,6 @@ namespace Frontend.Controllers
                 this.client.DefaultRequestHeaders.Add("Authorization", $"Basic {userNamePasswordString}");
                 this.client.PostAsync("api/values/PostJson", new StringContent(encryptedJsonString));
                 #endregion
-
-
             }
             return Json("Upload Successful.");
         }
