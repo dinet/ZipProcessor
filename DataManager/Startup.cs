@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataManager.Middlewares;
 using DataManager.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +42,7 @@ namespace DataManager
             {
                 app.UseHsts();
             }
-
+            app.UseMiddleware<BasicAuthenticationMiddleware>();
             app.UseHttpsRedirection();
             app.UseMvc();
         }
