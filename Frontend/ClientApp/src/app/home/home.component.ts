@@ -17,7 +17,7 @@ export class HomeComponent {
     this.fileToUpload = files.item(0);
     const formData = new FormData();
     formData.append(this.fileToUpload.name, this.fileToUpload);
-    this.http.post(this.baseUrl + 'api/SampleData/UploadFile', formData).subscribe(
+    this.http.post(this.baseUrl + 'api/files/UploadFile', formData).subscribe(
         data => console.log('success'),
         error => console.log(error)
       ); 

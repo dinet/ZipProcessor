@@ -23,7 +23,6 @@ namespace DataManager.Middlewares
 
         public async Task Invoke(HttpContext context, EncryptionHelper encryptionHelper)
         {
-
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic"))
             {

@@ -1,4 +1,5 @@
 using Frontend.Helpers;
+using Frontend.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +30,7 @@ namespace Frontend
                 configuration.RootPath = "ClientApp/dist";
             });
             services.AddScoped<EncryptionHelper>();
+            services.AddScoped<FilesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

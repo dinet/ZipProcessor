@@ -12,10 +12,10 @@ namespace Frontend.Helpers
     {
         private byte[] encryption_key;
         private byte[] salt;
-        public EncryptionHelper(IConfiguration iConfig)
+        public EncryptionHelper(IConfiguration config)
         {
-            this.encryption_key = Convert.FromBase64String(iConfig.GetValue<string>("EncryptionKeys:Key"));
-            this.salt = Convert.FromBase64String(iConfig.GetValue<string>("EncryptionKeys:IV"));
+            this.encryption_key = Convert.FromBase64String(config.GetValue<string>("EncryptionKeys:Key"));
+            this.salt = Convert.FromBase64String(config.GetValue<string>("EncryptionKeys:IV"));
         }
         public byte[] Encrypt(string plainText)
         {

@@ -2,14 +2,14 @@
 
 namespace DataManager.Models
 {
-    public class Node
+    public class Folder
     {
-        public Node()
+        public Folder()
         {
-            Contents = new List<Node>();
+            Contents = new List<Folder>();
         }
 
         public string Title { get; set; }
-        public List<Node> Contents { get; set; }
+        public List<Folder> Contents { get; set; }
     }
 }
