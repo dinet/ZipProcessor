@@ -14,7 +14,9 @@ namespace Frontend.Helpers
         private byte[] salt;
         public EncryptionHelper(IConfiguration config)
         {
+            //Retriving the encryption key from the config
             this.encryption_key = Convert.FromBase64String(config.GetValue<string>("EncryptionKeys:Key"));
+            //Retriving the salt value from the config
             this.salt = Convert.FromBase64String(config.GetValue<string>("EncryptionKeys:IV"));
         }
         public byte[] Encrypt(string plainText)
