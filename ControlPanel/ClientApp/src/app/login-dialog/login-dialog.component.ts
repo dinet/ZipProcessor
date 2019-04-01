@@ -12,12 +12,14 @@ export class LoginDialogComponent implements OnInit {
   password: string;
 
   modalTitle: string;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<LoginDialogComponent>) {
-    this.modalTitle = data.title;
-    console.log(data)
+  constructor(private dialogRef: MatDialogRef<LoginDialogComponent>) {
   }
   submit() {
-    this.dialogRef.close();
+    const credentials = {
+      username: this.username,
+      password: this.password
+    }
+    this.dialogRef.close(credentials);
   }
   ngOnInit() {
   }
