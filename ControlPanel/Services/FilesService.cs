@@ -5,8 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.IO.Compression;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace Frontend.Services
 {
@@ -20,26 +22,33 @@ namespace Frontend.Services
             _config = config;
             _encryptionHelper = encryptionHelper;
         }
-        public void UploadFile(IFormFile zipFile, string username, string password)
+        public async Task<HttpResponseMessage> UploadFile(IFormFile zipFile, string username, string password)
         {
-            //Encrypt username and password
-            byte[] usernamePassword = _encryptionHelper.Encrypt($"{username}:{password}");
-            // Convert encrypted password(byte array) to base 64 string
-            string userNamePasswordString = Convert.ToBase64String(usernamePassword);
-            //Converting zipfile to Json string
-            string jsonString = this.ConvertFileToJSONString(zipFile);
-            //Encrypting the json string
-            byte[] encrypted = _encryptionHelper.Encrypt(jsonString);
-            // Convert encrypted json string(byte array) to base 64 string
-            string encryptedJsonString = Convert.ToBase64String(encrypted);
+            try
+            {
+                //Encrypt username and password
+                byte[] usernamePassword = _encryptionHelper.Encrypt($"{username}:{password}");
+                // Convert encrypted password(byte array) to base 64 string
+                string userNamePasswordString = Convert.ToBase64String(usernamePassword);
+                //Converting zipfile to Json string
+                string jsonString = this.ConvertFileToJSONString(zipFile);
+                //Encrypting the json string
+                byte[] encrypted = _encryptionHelper.Encrypt(jsonString);
+                // Convert encrypted json string(byte array) to base 64 string
+                string encryptedJsonString = Convert.ToBase64String(encrypted);
 
-            HttpClient client = new HttpClient();
-            //Setting the base address of the data manager from config
-            client.BaseAddress = new Uri(_config.GetValue<string>("DataManagerApi:BaseUrl"));
-            //Setting up the authorization header
-            client.DefaultRequestHeaders.Add("Authorization", $"Basic {userNamePasswordString}");
-            //sending data to datamanager
-            client.PostAsync(_config.GetValue<string>("DataManagerApi:UploadFilePath"), new StringContent(encryptedJsonString));
+                HttpClient client = new HttpClient();
+                //Setting the base address of the data manager from config
+                client.BaseAddress = new Uri(_config.GetValue<string>("DataManagerApi:BaseUrl"));
+                //Setting up the authorization header
+                client.DefaultRequestHeaders.Add("Authorization", $"Basic {userNamePasswordString}");
+                //sending data to datamanager
+                return await client.PostAsync(_config.GetValue<string>("DataManagerApi:UploadFilePath"), new StringContent(encryptedJsonString));
+            }
+            catch (Exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
         }
 
         private string ConvertFileToJSONString(IFormFile zipFile)
@@ -71,7 +80,6 @@ namespace Frontend.Services
             string jsonString = JsonConvert.SerializeObject(root);
             return jsonString;
         }
-
     }
 }
 

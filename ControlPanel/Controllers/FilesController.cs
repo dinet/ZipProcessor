@@ -18,7 +18,7 @@ namespace ControlPanel.Controllers
             _filesService = filesService;
         }
         [HttpPost("[action]"), DisableRequestSizeLimit]
-        public ActionResult UploadFile()
+        public async Task<IActionResult> UploadFile()
         {
             //TODO Check if the form or files is null
             var file = Request.Form.Files[0];
@@ -26,9 +26,9 @@ namespace ControlPanel.Controllers
             var dict = Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
             if (file.Length > 0)
             {
-                _filesService.UploadFile(file,dict["username"],dict["password"]);
+                await _filesService.UploadFile(file, dict["username"], dict["password"]);
             }
-            return null;
+            return new OkResult();
         }
     }
 }
