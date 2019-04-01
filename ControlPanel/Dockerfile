@@ -5,9 +5,9 @@ EXPOSE 80
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY ["Frontend/ControlPanel.csproj", "Frontend/"]
-RUN dotnet restore "Frontend/ControlPanel.csproj"
+RUN dotnet restore "ControlPanel/ControlPanel.csproj"
 COPY . .
-WORKDIR "/src/Frontend"
+WORKDIR "/src/ControlPanel"
 RUN dotnet build "ControlPanel.csproj" -c Release -o /app
 
 FROM build AS publish
