@@ -30,7 +30,12 @@ export class HomeComponent {
         formData.append('username', result.username);
         formData.append('password', result.password);
         this.http.post(this.baseUrl + 'api/files/UploadFile', formData).subscribe(
-          data => console.log('success'),
+          data => {
+            var da : any = data;
+            if (!da.isSuccessStatusCode) {
+              alert(da.reasonPhrase);
+            }
+          },
           error => console.log(error)
         );
       });
