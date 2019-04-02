@@ -17,11 +17,6 @@ namespace DataManager.DAL
             _records = database.GetCollection<Folder>("Folders");
         }
 
-        //public List<FileDAO> Get()
-        //{
-        //    return _records.Find(book => true).ToList();
-        //}
-
         public Folder Create(Folder folder)
         {
             _records.InsertOne(folder);

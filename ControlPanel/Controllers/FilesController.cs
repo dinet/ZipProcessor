@@ -22,12 +22,11 @@ namespace ControlPanel.Controllers
         [HttpPost("[action]"), DisableRequestSizeLimit]
         public async Task<HttpResponseMessage> UploadFile()
         {
-            //TODO Check if the form or files is null
             var file = Request.Form.Files[0];
             if (file.Length > 0 && file.FileName.EndsWith(".zip"))
             {
-                //TODO Check username password avaialble 
                 var dict = Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
+               // Uploading file to datamanager
                 return await _filesService.UploadFile(file, dict["username"], dict["password"]);
             }
             return new HttpResponseMessage(HttpStatusCode.Forbidden) { ReasonPhrase = "Cannot detect a valid zip file" };

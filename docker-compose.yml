@@ -5,9 +5,6 @@ services:
   mongo:
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
 
@@ -16,9 +13,6 @@ services:
     restart: always
     ports:
       - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
     depends_on:
       - mongo
 
@@ -29,7 +23,7 @@ services:
       dockerfile: DataManager/Dockerfile
     restart: always
     ports:
-      - 15933:80
+      - 5000:80
     environment:
       MongoDB__Host: mongo
     depends_on:
@@ -44,6 +38,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
-      - 8024:80
+      - 8080:80
     depends_on:
       - datamanager

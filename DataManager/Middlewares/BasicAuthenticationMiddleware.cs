@@ -23,32 +23,40 @@ namespace DataManager.Middlewares
 
         public async Task Invoke(HttpContext context, EncryptionHelper encryptionHelper)
         {
-            string authHeader = context.Request.Headers["Authorization"];
-            if (authHeader != null && authHeader.StartsWith("Basic"))
+            try
             {
-                //Extract credentials
-                string encryptedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
-                byte[] encryptedUsernamePasswordBytes = Convert.FromBase64String(encryptedUsernamePassword);
-                string usernamePassword = encryptionHelper.Decrypt(encryptedUsernamePasswordBytes);
-
-                string[] stringSplits = usernamePassword.Split(':');
-                string username = stringSplits[0];
-                string password = stringSplits[1];
-
-                if (IsAuthorized(username, password))
+                string authHeader = context.Request.Headers["Authorization"];
+                if (authHeader != null && authHeader.StartsWith("Basic"))
                 {
-                    await _next.Invoke(context);
+                    //Extract credentials
+                    string encryptedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
+                    byte[] encryptedUsernamePasswordBytes = Convert.FromBase64String(encryptedUsernamePassword);
+                    string usernamePassword = encryptionHelper.Decrypt(encryptedUsernamePasswordBytes);
+
+                    string[] stringSplits = usernamePassword.Split(':');
+                    string username = stringSplits[0];
+                    string password = stringSplits[1];
+
+                    if (IsAuthorized(username, password))
+                    {
+                        await _next.Invoke(context);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 401; //Unauthorized
+                        return;
+                    }
                 }
                 else
                 {
+                    // no authorization header
                     context.Response.StatusCode = 401; //Unauthorized
                     return;
                 }
             }
-            else
+            catch (Exception)
             {
-                // no authorization header
-                context.Response.StatusCode = 401; //Unauthorized
+                context.Response.StatusCode = 500;
                 return;
             }
         }

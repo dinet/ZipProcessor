@@ -35,6 +35,9 @@ export class HomeComponent {
             if (!da.isSuccessStatusCode) {
               alert(da.reasonPhrase);
             }
+            else {
+              alert("Sucessfully uploaded the file");
+            }
           },
           error => console.log(error)
         );
