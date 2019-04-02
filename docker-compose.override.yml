@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  datamanager:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
+  controlpanel:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
